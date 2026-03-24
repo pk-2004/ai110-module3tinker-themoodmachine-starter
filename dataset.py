@@ -36,6 +36,16 @@ NEGATIVE_WORDS = [
     "stressed",
     "hate",
     "boring",
+    "stuck",
+    "traffic",
+    "failed",
+    "fail",
+    "exhausted",
+    "miserable",
+    "horrible",
+    "frustrated",
+    "annoyed",
+    "worst",
 ]
 
 # ---------------------------------------------------------------------
@@ -92,3 +102,28 @@ TRUE_LABELS = [
 #
 # Remember to keep them aligned:
 #   len(SAMPLE_POSTS) == len(TRUE_LABELS)
+
+SAMPLE_POSTS.append("no cap this is the best day of my life 😂")
+TRUE_LABELS.append("positive")
+
+SAMPLE_POSTS.append("I absolutely love getting stuck in traffic for two hours")
+TRUE_LABELS.append("negative")  
+SAMPLE_POSTS.append("lowkey stressed but highkey thriving rn")
+TRUE_LABELS.append("mixed")  
+
+SAMPLE_POSTS.append("it is what it is 🥲")
+TRUE_LABELS.append("neutral") 
+SAMPLE_POSTS.append("just failed my exam but honestly whatever 💀")
+TRUE_LABELS.append("negative")  
+
+SAMPLE_POSTS.append("woke up happy then remembered everything :(")
+TRUE_LABELS.append("mixed")  
+
+SAMPLE_POSTS.append("honestly not bad for a Monday")
+TRUE_LABELS.append("positive") 
+
+SAMPLE_POSTS.append("missing my friends so much rn 😢")
+TRUE_LABELS.append("negative")
+
+SAMPLE_POSTS.append("got a lot done today even though I'm exhausted")
+TRUE_LABELS.append("mixed")  

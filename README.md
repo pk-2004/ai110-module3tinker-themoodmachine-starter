@@ -65,3 +65,7 @@ During this lab you will:
 - When debugging, print tokens, scores, or intermediate choices.
 - Ask an AI assistant to help create edge case posts or unusual wording.
 - Try examples that mislead or confuse your model. Failure cases teach you the most.
+
+
+TF Task:
+The core concept students needed to understand is how in the high level ML models work and the difference between rule based and ML models. Students might struggle at the part of implementing the score function. AI was helpful and provided great insight into implementing the methods. I would stray away from explicitly giving the answer by helping the group to ask the AI chatbot that helps them obtain the answer with in depth reasoning. 

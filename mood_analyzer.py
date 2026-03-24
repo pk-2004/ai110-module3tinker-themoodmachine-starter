@@ -9,9 +9,26 @@ This class starts with very simple logic:
   - Convert that score into a mood label
 """
 
+import re
 from typing import List, Dict, Tuple, Optional
 
 from dataset import POSITIVE_WORDS, NEGATIVE_WORDS
+
+# Text emoticons mapped to sentiment tokens.
+_EMOTICONS: Dict[str, str] = {
+    ":)": "happy", ":-)": "happy", ":D": "happy", "=)": "happy",
+    ":(": "sad", ":-(": "sad", ":'(": "sad",
+    ":P": "happy", ";)": "happy",
+}
+
+# Unicode emojis mapped to sentiment tokens.
+_EMOJIS: Dict[str, str] = {
+    "😂": "happy", "😊": "happy", "😍": "happy", "🥰": "happy",
+    "❤️": "happy", "🎉": "happy", "😁": "happy",
+    "😢": "sad", "😭": "sad", "🥲": "sad", "😔": "sad",
+    "😡": "angry", "😤": "angry",
+    "💀": "dead", "😐": "neutral",
+}
 
 
 class MoodAnalyzer:
@@ -40,20 +57,23 @@ class MoodAnalyzer:
         """
         Convert raw text into a list of tokens the model can work with.
 
-        TODO: Improve this method.
-
-        Right now, it does the minimum:
-          - Strips leading and trailing whitespace
-          - Converts everything to lowercase
-          - Splits on spaces
-
-        Ideas to improve:
-          - Remove punctuation
-          - Handle simple emojis separately (":)", ":-(", "🥲", "😂")
-          - Normalize repeated characters ("soooo" -> "soo")
+        Steps applied in order:
+          1. Replace text emoticons (":)", ":-(") with sentiment tokens
+          2. Replace unicode emojis ("😂", "🥲") with sentiment tokens
+          3. Normalize repeated characters ("soooo" -> "soo")
+          4. Strip punctuation and lowercase
+          5. Split on whitespace
         """
-        cleaned = text.strip().lower()
-        tokens = cleaned.split()
+
+        for emoticon, token in _EMOTICONS.items():
+            text = text.replace(emoticon, f" {token} ")
+
+        for emoji, token in _EMOJIS.items():
+            text = text.replace(emoji, f" {token} ")
+
+        text = text.lower()
+        text = re.sub(r"[^a-z0-9\s]", " ", text)
+        tokens = text.split()
 
         return tokens
 
@@ -83,7 +103,34 @@ class MoodAnalyzer:
         #
         # Hint: if you implement negation, you may want to look at pairs of tokens,
         # like ("not", "happy") or ("never", "fun").
-        pass
+ 
+        negation_words = {"not", "never", "no", "hardly", "barely"}
+
+        strong_positive = {"love", "amazing", "awesome", "excited"}
+        strong_negative = {"hate", "terrible", "awful"}
+
+        tokens = self.preprocess(text)
+        score = 0
+
+        for i, token in enumerate(tokens):
+            negated = i > 0 and tokens[i - 1] in negation_words
+
+            if token in self.positive_words:
+                weight = 2 if token in strong_positive else 1
+                score += -weight if negated else weight
+            elif token in self.negative_words:
+                weight = 2 if token in strong_negative else 1
+                score += weight if negated else -weight
+
+
+        pos_hits = [t for t in tokens if t in self.positive_words]
+        neg_hits = [t for t in tokens if t in self.negative_words]
+        strong_pos_hits = [t for t in pos_hits if t in strong_positive]
+        if strong_pos_hits and neg_hits:
+            score -= len(neg_hits) * 2
+
+        return score
+            
 
     # ---------------------------------------------------------------------
     # Label prediction
@@ -110,7 +157,13 @@ class MoodAnalyzer:
         #   2. Return "positive" if the score is above 0.
         #   3. Return "negative" if the score is below 0.
         #   4. Return "neutral" otherwise.
-        pass
+        score = self.score_text(text)
+        if score >0:
+            return "positive"
+        elif score < 0:
+            return "negative"
+        else:
+            return "neutral"
 
     # ---------------------------------------------------------------------
     # Explanations (optional but recommended)
